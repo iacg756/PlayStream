@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="PlayStream.Api/PlayStream.Api.csproj" />
+  <Project Path="PlayStream.Core/PlayStream.Core.csproj" />
+  <Project Path="PlayStream.Infrastructure/PlayStream.Infrastructure.csproj" />
+  <Project Path="PlayStream.Services/PlayStream.Services.csproj" />
+</Solution>
