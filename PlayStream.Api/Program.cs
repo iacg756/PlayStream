@@ -23,28 +23,21 @@ namespace PlayStream.Api
             options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
             #endregion
 
-            // 1. Registrar los servicios de negocio
             builder.Services.AddTransient<IUsuarioService, UsuarioService>();
             builder.Services.AddTransient<IContenidoService, ContenidoService>();
-            builder.Services.AddTransient<IPerfilService, PerfilService>(); // NUEVO
+            builder.Services.AddTransient<IPerfilService, PerfilService>();
 
-            // 2. Registrar el repositorio genérico
             builder.Services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
 
-            // 3. Configurar Controladores y NewtonsoftJson
             builder.Services.AddControllers().AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             });
 
-            // 4. Registra AutoMapper escaneando todos los profiles
             builder.Services.AddAutoMapper(typeof(UsuarioProfile).Assembly);
 
-            // 5. Configurar FluentValidation Automático (NUEVO MÉTODO)
             builder.Services.AddFluentValidationAutoValidation();
             builder.Services.AddValidatorsFromAssemblyContaining<UsuarioDtoValidator>();
-
-            // 6. Configurar OpenAPI
             builder.Services.AddOpenApi();
 
             var app = builder.Build();
