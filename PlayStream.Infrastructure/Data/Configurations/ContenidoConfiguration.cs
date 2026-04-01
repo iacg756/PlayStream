@@ -8,11 +8,14 @@ namespace PlayStream.Infrastructure.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Contenido> builder)
         {
+            builder.HasKey(e => e.Id).HasName("PRIMARY");
             builder.ToTable("contenido");
-            builder.HasKey(e => e.Id);
-            builder.Property(e => e.Titulo).IsRequired().HasMaxLength(200);
+
+            builder.Property(e => e.Id).HasColumnType("int(11)");
+            builder.Property(e => e.AnioLanzamiento).HasColumnType("int(11)");
+            builder.Property(e => e.Categoria).HasMaxLength(50);
             builder.Property(e => e.Descripcion).HasMaxLength(500);
-            builder.Property(e => e.Categoria).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.Titulo).HasMaxLength(200);
         }
     }
 }

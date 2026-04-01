@@ -38,6 +38,8 @@ namespace PlayStream.Api
 
             builder.Services.AddFluentValidationAutoValidation();
             builder.Services.AddValidatorsFromAssemblyContaining<UsuarioDtoValidator>();
+            builder.Services.AddValidatorsFromAssemblyContaining<PerfilDtoValidator>();
+
             builder.Services.AddOpenApi();
 
             var app = builder.Build();

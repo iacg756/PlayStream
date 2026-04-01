@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
+using FluentValidation;
 using PlayStream.Core.Entities;
 using PlayStream.Core.DTOs;
 using PlayStream.Services.Interfaces;
@@ -16,11 +17,12 @@ namespace PlayStream.Api.Controllers
     {
         private readonly IPerfilService _perfilService;
         private readonly IMapper _mapper;
-
-        public PerfilesController(IPerfilService perfilService, IMapper mapper)
+        private readonly IValidator<PerfilDto> _validator;
+        public PerfilesController(IPerfilService perfilService, IMapper mapper, IValidator<PerfilDto> validator)
         {
             _perfilService = perfilService;
             _mapper = mapper;
+            _validator = validator;
         }
 
         [HttpGet("usuario/{usuarioId}")]
@@ -34,6 +36,12 @@ namespace PlayStream.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(PerfilDto perfilDto)
         {
+            var validationResult = await _validator.ValidateAsync(perfilDto);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new { message = "Errores de validación", errors = validationResult.Errors });
+            }
+
             try
             {
                 var perfil = _mapper.Map<Perfil>(perfilDto);
@@ -43,7 +51,59 @@ namespace PlayStream.Api.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = "Error de validación", error = ex.Message });
+                return BadRequest(new { message = "Error de regla de negocio", error = ex.Message });
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, PerfilDto perfilDto)
+        {
+            var validationResult = await _validator.ValidateAsync(perfilDto);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new { message = "Errores de validación", errors = validationResult.Errors });
+            }
+
+            try
+            {
+                var perfilExistente = await _perfilService.GetPerfilById(id);
+                if (perfilExistente == null)
+                {
+                    return NotFound(new { message = $"No se encontró el perfil con ID {id} para actualizar." });
+                }
+
+                perfilExistente.NombrePerfil = perfilDto.NombrePerfil;
+                perfilExistente.AvatarUrl = perfilDto.AvatarUrl;
+
+                await _perfilService.UpdatePerfil(perfilExistente);
+                
+                var resultDto = _mapper.Map<PerfilDto>(perfilExistente);
+                return Ok(new ApiResponse<PerfilDto>(resultDto));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Error al actualizar el perfil", error = ex.Message });
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                var perfilExistente = await _perfilService.GetPerfilById(id);
+                if (perfilExistente == null)
+                {
+                    return NotFound(new { message = $"No se encontró el perfil con ID {id} para eliminar." });
+                }
+
+                await _perfilService.DeletePerfil(id);
+
+                return Ok(new { message = "Perfil eliminado correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Error al eliminar el perfil", error = ex.Message });
             }
         }
     }

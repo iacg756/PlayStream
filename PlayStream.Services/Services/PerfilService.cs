@@ -41,6 +41,7 @@ namespace PlayStream.Services.Services
         }
 
         public async Task UpdatePerfil(Perfil perfil) => await _perfilRepository.UpdateAsync(perfil);
+
         public async Task DeletePerfil(int id) => await _perfilRepository.DeleteAsync(id);
     }
 }
