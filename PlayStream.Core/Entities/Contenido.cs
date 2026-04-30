@@ -11,7 +11,7 @@ public partial class Contenido : BaseEntity
     public string? Descripcion { get; set; }
 
     public string Categoria { get; set; } = null!;
-
+    
     public int AnioLanzamiento { get; set; }
 
     public virtual ICollection<Calificacion> Calificacions { get; set; } = new List<Calificacion>();

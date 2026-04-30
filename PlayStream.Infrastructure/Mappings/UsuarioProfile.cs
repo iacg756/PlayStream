@@ -12,17 +12,14 @@ namespace PlayStream.Infrastructure.Mappings
         {
             CreateMap<Usuario, UsuarioDto>()
                 .ForMember(dest => dest.FechaRegistro,
-                    // Le decimos explícitamente a AutoMapper de dónde sacar la info
                     opt => opt.ConvertUsing(new DateTimeToStringConverter(), src => src.FechaRegistro));
 
             CreateMap<UsuarioDto, Usuario>()
                 .ForMember(dest => dest.FechaRegistro,
-                    // Le decimos explícitamente a AutoMapper de dónde sacar la info
                     opt => opt.ConvertUsing(new StringToDateTimeConverter(), src => src.FechaRegistro));
         }
     }
 
-    // Le agregamos el '?' al DateTime para que no explote si la fecha viene vacía o es Nula en la BD
     public class DateTimeToStringConverter : IValueConverter<DateTime?, string>
     {
         public string Convert(DateTime? source, ResolutionContext context)

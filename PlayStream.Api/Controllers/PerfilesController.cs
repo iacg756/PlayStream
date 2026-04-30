@@ -34,16 +34,16 @@ namespace PlayStream.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(PerfilDto perfilDto)
+        public async Task<IActionResult> Post([FromBody] PerfilDto perfilDto)
         {
-            var validationResult = await _validator.ValidateAsync(perfilDto);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new { message = "Errores de validación", errors = validationResult.Errors });
-            }
-
             try
             {
+                var validationResult = await _validator.ValidateAsync(perfilDto);
+                if (!validationResult.IsValid)
+                {
+                    return BadRequest(new { message = "Errores de validación", errors = validationResult.Errors });
+                }
+
                 var perfil = _mapper.Map<Perfil>(perfilDto);
                 await _perfilService.InsertPerfil(perfil);
                 var resultDto = _mapper.Map<PerfilDto>(perfil);
@@ -51,7 +51,7 @@ namespace PlayStream.Api.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = "Error de regla de negocio", error = ex.Message });
+                return StatusCode(500, new { message = "Error interno", error = ex.Message, stackTrace = ex.StackTrace });
             }
         }
 
