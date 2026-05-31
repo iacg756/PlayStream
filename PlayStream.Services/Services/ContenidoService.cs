@@ -1,53 +1,75 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using PlayStream.Core.CustomEntities;
 using PlayStream.Core.Entities;
+using PlayStream.Core.Enum;
 using PlayStream.Core.Interfaces;
-using PlayStream.Services.Interfaces;
 using PlayStream.Core.QueryFilters;
-using System.Linq;
+using PlayStream.Services.Interfaces;
+using System.Net;
 
 namespace PlayStream.Services.Services
 {
     public class ContenidoService : IContenidoService
     {
         private readonly IUnitOfWork _unitOfWork;
+
         public ContenidoService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<Contenido>> GetContenidos(ContenidoQueryFilter? filters = null)
+        public async Task<ResponseData> GetContenidosPaginados(ContenidoQueryFilter filters)
         {
             var contenidos = await _unitOfWork.ContenidoRepository.GetAllAsync();
-            if (filters == null) return contenidos;
 
             if (!string.IsNullOrWhiteSpace(filters.Categoria))
-                contenidos = contenidos.Where(c => c.Categoria != null && c.Categoria.ToLower().Contains(filters.Categoria.ToLower()));
+                contenidos = contenidos.Where(c => c.Categoria.ToLower().Contains(filters.Categoria.ToLower()));
 
             if (filters.AnioLanzamiento.HasValue)
                 contenidos = contenidos.Where(c => c.AnioLanzamiento == filters.AnioLanzamiento.Value);
 
             if (!string.IsNullOrWhiteSpace(filters.Titulo))
-                contenidos = contenidos.Where(c => c.Titulo != null && c.Titulo.ToLower().Contains(filters.Titulo.ToLower()));
+                contenidos = contenidos.Where(c => c.Titulo.ToLower().Contains(filters.Titulo.ToLower()));
 
-            if (filters.DuracionMinima.HasValue)
+            var pagedList = PagedList<object>.Create(
+                contenidos.Cast<object>(),
+                filters.PageNumber,
+                filters.PageSize);
+
+            if (pagedList.Any())
             {
-                contenidos = contenidos.Where(c => true);
+                return new ResponseData
+                {
+                    Messages = new[] { new Message { Type = TypeMessage.information.ToString(), Description = "Contenidos recuperados correctamente." } },
+                    Pagination = pagedList,
+                    StatusCode = HttpStatusCode.OK
+                };
             }
-
-            return contenidos;
+            else
+            {
+                return new ResponseData
+                {
+                    Messages = new[] { new Message { Type = TypeMessage.warning.ToString(), Description = "No se encontraron contenidos con los filtros indicados." } },
+                    Pagination = pagedList,
+                    StatusCode = HttpStatusCode.OK
+                };
+            }
         }
-        public async Task<Contenido> GetContenidoById(int id) => await _unitOfWork.ContenidoRepository.GetByIdAsync(id);
+
+        public async Task<Contenido?> GetContenidoById(int id) =>
+            await _unitOfWork.ContenidoRepository.GetByIdAsync(id);
+
         public async Task InsertContenido(Contenido contenido)
         {
             await _unitOfWork.ContenidoRepository.AddAsync(contenido);
             await _unitOfWork.SaveChangesAsync();
         }
+
         public async Task UpdateContenido(Contenido contenido)
         {
             await _unitOfWork.ContenidoRepository.UpdateAsync(contenido);
             await _unitOfWork.SaveChangesAsync();
         }
+
         public async Task DeleteContenido(int id)
         {
             await _unitOfWork.ContenidoRepository.DeleteAsync(id);

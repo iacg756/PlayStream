@@ -13,11 +13,12 @@ namespace PlayStream.Infrastructure.Repositories
         private readonly IDapperContext _dapper;
         private IDbContextTransaction? _efTransaction;
 
-        private IRepository<Usuario> _usuarioRepository;
-        private IRepository<Contenido> _contenidoRepository;
-        private IRepository<Perfil> _perfilRepository;
-        private IRepository<Favorito> _favoritoRepository;
-        private IRepository<Calificacion> _calificacionRepository;
+        private IRepository<Usuario>? _usuarioRepository;
+        private IRepository<Contenido>? _contenidoRepository;
+        private IRepository<Perfil>? _perfilRepository;
+        private IRepository<Favorito>? _favoritoRepository;
+        private IRepository<Calificacion>? _calificacionRepository;
+        private ISecurityRepository? _securityRepository;
 
         public UnitOfWork(PlayStreamContext context, IDapperContext dapper)
         {
@@ -25,11 +26,23 @@ namespace PlayStream.Infrastructure.Repositories
             _dapper = dapper;
         }
 
-        public IRepository<Usuario> UsuarioRepository => _usuarioRepository ??= new BaseRepository<Usuario>(_context);
-        public IRepository<Contenido> ContenidoRepository => _contenidoRepository ??= new BaseRepository<Contenido>(_context);
-        public IRepository<Perfil> PerfilRepository => _perfilRepository ??= new BaseRepository<Perfil>(_context);
-        public IRepository<Favorito> FavoritoRepository => _favoritoRepository ??= new BaseRepository<Favorito>(_context);
-        public IRepository<Calificacion> CalificacionRepository => _calificacionRepository ??= new BaseRepository<Calificacion>(_context);
+        public IRepository<Usuario> UsuarioRepository =>
+            _usuarioRepository ??= new BaseRepository<Usuario>(_context);
+
+        public IRepository<Contenido> ContenidoRepository =>
+            _contenidoRepository ??= new BaseRepository<Contenido>(_context);
+
+        public IRepository<Perfil> PerfilRepository =>
+            _perfilRepository ??= new BaseRepository<Perfil>(_context);
+
+        public IRepository<Favorito> FavoritoRepository =>
+            _favoritoRepository ??= new BaseRepository<Favorito>(_context);
+
+        public IRepository<Calificacion> CalificacionRepository =>
+            _calificacionRepository ??= new BaseRepository<Calificacion>(_context);
+
+        public ISecurityRepository SecurityRepository =>
+            _securityRepository ??= new SecurityRepository(_context);
 
         public async Task BeginTransactionAsync()
         {

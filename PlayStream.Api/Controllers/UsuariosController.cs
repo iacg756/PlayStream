@@ -1,17 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
-using PlayStream.Core.Entities;
-using PlayStream.Core.DTOs;
-using PlayStream.Services.Interfaces;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PlayStream.Api.Responses;
+using PlayStream.Core.DTOs;
+using PlayStream.Core.Entities;
+using PlayStream.Core.QueryFilters;
+using PlayStream.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PlayStream.Api.Controllers
 {
-    [ApiController]
+    [Authorize]
+    [Produces("application/json")]
     [Route("api/[controller]")]
+    [ApiController]
     public class UsuariosController : ControllerBase
     {
         private readonly IUsuarioService _usuarioService;
@@ -24,9 +28,9 @@ namespace PlayStream.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get([FromQuery] UsuarioQueryFilter? filters)
         {
-            var usuarios = await _usuarioService.GetUsuarios();
+            var usuarios = await _usuarioService.GetUsuarios(filters);
             var usuariosDto = _mapper.Map<IEnumerable<UsuarioDto>>(usuarios);
             return Ok(new ApiResponse<IEnumerable<UsuarioDto>>(usuariosDto));
         }

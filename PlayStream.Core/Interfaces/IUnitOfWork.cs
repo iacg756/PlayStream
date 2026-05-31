@@ -10,6 +10,7 @@ namespace PlayStream.Core.Interfaces
         IRepository<Perfil> PerfilRepository { get; }
         IRepository<Favorito> FavoritoRepository { get; }
         IRepository<Calificacion> CalificacionRepository { get; }
+        ISecurityRepository SecurityRepository { get; } 
 
         void SaveChanges();
         Task SaveChangesAsync();

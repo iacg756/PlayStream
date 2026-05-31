@@ -1,18 +1,22 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
+﻿using AutoMapper;
 using FluentValidation;
-using PlayStream.Core.Entities;
-using PlayStream.Core.DTOs;
-using PlayStream.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PlayStream.Api.Responses;
+using PlayStream.Core.DTOs;
+using PlayStream.Core.Entities;
+using PlayStream.Core.QueryFilters;
+using PlayStream.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PlayStream.Api.Controllers
 {
-    [ApiController]
+    [Authorize]
+    [Produces("application/json")]
     [Route("api/[controller]")]
+    [ApiController]
     public class PerfilesController : ControllerBase
     {
         private readonly IPerfilService _perfilService;
@@ -26,9 +30,12 @@ namespace PlayStream.Api.Controllers
         }
 
         [HttpGet("usuario/{usuarioId}")]
-        public async Task<IActionResult> GetByUsuario(int usuarioId)
+        public async Task<IActionResult> GetByUsuario(int usuarioId, [FromQuery] PerfilQueryFilter? filters)
         {
-            var perfiles = await _perfilService.GetPerfilesByUsuario(usuarioId);
+            filters ??= new PerfilQueryFilter();
+            filters.UsuarioId = usuarioId;
+
+            var perfiles = await _perfilService.GetPerfiles(filters);
             var perfilesDto = _mapper.Map<IEnumerable<PerfilDto>>(perfiles);
             return Ok(new ApiResponse<IEnumerable<PerfilDto>>(perfilesDto));
         }

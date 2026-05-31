@@ -1,16 +1,19 @@
-using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using FluentValidation;
-using PlayStream.Services.Interfaces;
-using PlayStream.Core.QueryFilters;
-using PlayStream.Core.DTOs;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PlayStream.Api.Responses;
+using PlayStream.Core.DTOs;
 using PlayStream.Core.Entities;
+using PlayStream.Core.QueryFilters;
+using PlayStream.Services.Interfaces;
 
 namespace PlayStream.Api.Controllers
 {
-    [ApiController]
+    [Authorize]
+    [Produces("application/json")]
     [Route("api/[controller]")]
+    [ApiController]
     public class FavoritosController : ControllerBase
     {
         private readonly IFavoritoService _favoritoService;
@@ -33,9 +36,12 @@ namespace PlayStream.Api.Controllers
         }
 
         [HttpGet("perfil/{perfilId}")]
-        public async Task<IActionResult> GetByPerfil(int perfilId)
+        public async Task<IActionResult> GetByPerfil(int perfilId, [FromQuery] FavoritoQueryFilter? filters)
         {
-            var favoritos = await _favoritoService.GetFavoritosByPerfil(perfilId);
+            filters ??= new FavoritoQueryFilter();
+            filters.PerfilId = perfilId;
+
+            var favoritos = await _favoritoService.GetFavoritos(filters);
             var favoritosDto = _mapper.Map<IEnumerable<FavoritoDto>>(favoritos);
             return Ok(new ApiResponse<IEnumerable<FavoritoDto>>(favoritosDto));
         }

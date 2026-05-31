@@ -17,6 +17,8 @@ namespace PlayStream.Infrastructure.Mappings
             CreateMap<UsuarioDto, Usuario>()
                 .ForMember(dest => dest.FechaRegistro,
                     opt => opt.ConvertUsing(new StringToDateTimeConverter(), src => src.FechaRegistro));
+
+            CreateMap<Security, SecurityDto>().ReverseMap();
         }
     }
 

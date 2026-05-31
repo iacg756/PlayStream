@@ -16,7 +16,7 @@ namespace PlayStream.Infrastructure.Data
         public DbConnectionFactory(IConfiguration config)
         {
             _config = config;
-            _mySqlConn = _config.GetConnectionString("DefaultConnection") ?? string.Empty;
+            _mySqlConn = _config.GetConnectionString("ConnectionMySql") ?? string.Empty;
             var providerStr = _config.GetSection("DatabaseProvider").Value ?? "MySql";
 
             Provider = providerStr.Equals("MySql", StringComparison.OrdinalIgnoreCase)

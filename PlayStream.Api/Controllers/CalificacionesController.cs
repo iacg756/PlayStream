@@ -1,14 +1,17 @@
-using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
-using PlayStream.Services.Interfaces;
-using PlayStream.Core.QueryFilters;
-using PlayStream.Core.DTOs;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PlayStream.Api.Responses;
+using PlayStream.Core.DTOs;
+using PlayStream.Core.QueryFilters;
+using PlayStream.Services.Interfaces;
 
 namespace PlayStream.Api.Controllers
 {
-    [ApiController]
+    [Authorize]
+    [Produces("application/json")]
     [Route("api/[controller]")]
+    [ApiController]
     public class CalificacionesController : ControllerBase
     {
         private readonly ICalificacionService _calificacionService;
@@ -29,9 +32,12 @@ namespace PlayStream.Api.Controllers
         }
 
         [HttpGet("contenido/{contenidoId}")]
-        public async Task<IActionResult> GetByContenido(int contenidoId)
+        public async Task<IActionResult> GetByContenido(int contenidoId, [FromQuery] CalificacionQueryFilter? filters)
         {
-            var calificaciones = await _calificacionService.GetCalificacionesByContenido(contenidoId);
+            filters ??= new CalificacionQueryFilter();
+            filters.ContenidoId = contenidoId;
+
+            var calificaciones = await _calificacionService.GetCalificaciones(filters);
             var calificacionesDto = _mapper.Map<IEnumerable<CalificacionDto>>(calificaciones);
             return Ok(new ApiResponse<IEnumerable<CalificacionDto>>(calificacionesDto));
         }

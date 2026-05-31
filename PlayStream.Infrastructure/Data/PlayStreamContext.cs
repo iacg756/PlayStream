@@ -18,6 +18,7 @@ public partial class PlayStreamContext : DbContext
     public virtual DbSet<Perfil> Perfils { get; set; }
     public virtual DbSet<Rol> Rols { get; set; }
     public virtual DbSet<Usuario> Usuarios { get; set; }
+    public virtual DbSet<Security> Securities { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
