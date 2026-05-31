@@ -71,11 +71,26 @@ namespace PlayStream.Api
                 {
                     Title = "PlayStream API",
                     Version = "v1",
-                    Description = "Documentación de la API de PlayStream - .NET 9",
+                    Description = """
+                    API REST para la plataforma de streaming PlayStream.
+        
+                    Permite gestionar cuentas de usuario con roles (Administrador/Consumer), 
+                    múltiples perfiles por cuenta (máximo 4), un catálogo de películas y series 
+                    con búsqueda y filtros, y el registro de favoritos y calificaciones por perfil.
+        
+                    La mayoría de endpoints requieren autenticación JWT. 
+                    Usa POST /api/Token para obtener tu token y luego el botón Authorize
+
+                    Administrador Oficial (para pruebas):
+
+                    Usuario: admin
+                    Contraseña: admin123
+
+                    """,
                     Contact = new OpenApiContact
                     {
-                        Name = "Equipo de Desarrollo UCB",
-                        Email = "desarrollo@ucb.edu.bo"
+                        Name = "Ismael Coca - Sergio Guerra",
+                        Email = "ismael.coca.g@ucb.edu.bo"
                     }
                 });
 
