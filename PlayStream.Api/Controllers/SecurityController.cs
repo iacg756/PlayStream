@@ -9,9 +9,6 @@ using PlayStream.Services.Interfaces;
 
 namespace PlayStream.Api.Controllers
 {
-    /// <summary>
-    /// Gestión de usuarios del sistema (registro y administración)
-    /// </summary>
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
@@ -31,13 +28,6 @@ namespace PlayStream.Api.Controllers
             _passwordService = passwordService;
         }
 
-        /// <summary>
-        /// Registra un nuevo usuario. Solo Administradores pueden crear usuarios.
-        /// </summary>
-        /// <param name="securityDto">Datos del nuevo usuario.</param>
-        /// <returns>Usuario registrado.</returns>
-        /// <response code="200">Usuario registrado correctamente.</response>
-        /// <response code="403">No tiene permisos para esta acción.</response>
         [Authorize(Roles = nameof(RoleType.Administrador))]
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] SecurityDto securityDto)
@@ -50,9 +40,6 @@ namespace PlayStream.Api.Controllers
             return Ok(new ApiResponse<SecurityDto>(securityDto));
         }
 
-        /// <summary>
-        /// Endpoint de prueba de conexión (solo usuarios autenticados).
-        /// </summary>
         [Authorize]
         [HttpGet("me")]
         public IActionResult Me()

@@ -91,9 +91,6 @@ namespace PlayStream.Api.Controllers
             return Ok(new ApiResponse<ContenidoDto>(contenidoDto));
         }
 
-        /// <summary>
-        /// Crea un nuevo contenido. Solo Administradores.
-        /// </summary>
         [Authorize(Roles = "Administrador")]
         [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(ApiResponse<ContenidoDto>))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -114,9 +111,6 @@ namespace PlayStream.Api.Controllers
             }
         }
 
-        /// <summary>
-        /// Actualiza un contenido existente. Solo Administradores.
-        /// </summary>
         [Authorize(Roles = "Administrador")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<ContenidoDto>))]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -143,9 +137,6 @@ namespace PlayStream.Api.Controllers
             }
         }
 
-        /// <summary>
-        /// Elimina un contenido. Solo Administradores.
-        /// </summary>
         [Authorize(Roles = "Administrador")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]

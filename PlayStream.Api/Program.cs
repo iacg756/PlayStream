@@ -22,7 +22,6 @@ namespace PlayStream.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Configuración base
             builder.Configuration.Sources.Clear();
             builder.Configuration
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -35,16 +34,10 @@ namespace PlayStream.Api
                 builder.Configuration.AddUserSecrets<Program>();
             }
 
-            // =====================
-            // Configurar la BD MySql
-            // =====================
             var connectionString = builder.Configuration.GetConnectionString("ConnectionMySql");
             builder.Services.AddDbContext<PlayStreamContext>(options =>
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-            // =====================
-            // Registrar Servicios
-            // =====================
             builder.Services.AddTransient<IUsuarioService, UsuarioService>();
             builder.Services.AddTransient<IContenidoService, ContenidoService>();
             builder.Services.AddTransient<IPerfilService, PerfilService>();
@@ -71,9 +64,6 @@ namespace PlayStream.Api
             builder.Services.Configure<PasswordOptions>(
                 builder.Configuration.GetSection("PasswordOptions"));
 
-            // =====================
-            // Configurar Swagger
-            // =====================
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
             {
@@ -89,7 +79,6 @@ namespace PlayStream.Api
                     }
                 });
 
-                // Soporte para JWT en Swagger UI
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
@@ -123,9 +112,6 @@ namespace PlayStream.Api
                 options.EnableAnnotations();
             });
 
-            // =====================
-            // Configurar JWT
-            // =====================
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -146,14 +132,9 @@ namespace PlayStream.Api
                 };
             });
 
-            // =====================
-            // AutoMapper
-            // =====================
+
             builder.Services.AddAutoMapper(typeof(UsuarioProfile).Assembly);
 
-            // =====================
-            // Validadores FluentValidation
-            // =====================
             builder.Services.AddScoped<IValidator<UsuarioDto>, UsuarioDtoValidator>();
             builder.Services.AddScoped<IValidator<PerfilDto>, PerfilDtoValidator>();
             builder.Services.AddScoped<IValidator<CalificacionDto>, CalificacionDtoValidator>();
@@ -163,25 +144,14 @@ namespace PlayStream.Api
 
             var app = builder.Build();
 
-            // =====================
-            // Usar Swagger
-            // =====================
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI(options =>
-                {
-                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "PlayStream API v1");
-                    options.RoutePrefix = string.Empty;
-                });
-            }
-
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-            if (app.Environment.IsDevelopment())
+            app.UseSwagger();
+            app.UseSwaggerUI(options =>
             {
-                app.MapOpenApi();
-            }
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "PlayStream API v1");
+                options.RoutePrefix = string.Empty;
+            });
 
             app.UseHttpsRedirection();
 

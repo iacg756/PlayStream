@@ -5,9 +5,6 @@ using PlayStream.Services.Interfaces;
 
 namespace PlayStream.Api.Controllers
 {
-    /// <summary>
-    /// Panel Administrativo — solo accesible por Administradores
-    /// </summary>
     [Authorize(Roles = nameof(RoleType.Administrador))]
     [Produces("application/json")]
     [Route("api/[controller]")]
@@ -28,14 +25,11 @@ namespace PlayStream.Api.Controllers
             _perfilService = perfilService;
         }
 
-        /// <summary>
-        /// Resumen general del sistema para el panel de administración.
-        /// </summary>
         [HttpGet("dashboard")]
         public async Task<IActionResult> Dashboard()
         {
             var usuarios = await _usuarioService.GetUsuarios();
-            var contenidos = await _contenidoService.GetContenidoById(0); // solo para contar usamos GetAll
+            var contenidos = await _contenidoService.GetContenidoById(0); 
 
             return Ok(new
             {
@@ -45,9 +39,6 @@ namespace PlayStream.Api.Controllers
             });
         }
 
-        /// <summary>
-        /// Lista todos los usuarios del sistema.
-        /// </summary>
         [HttpGet("usuarios")]
         public async Task<IActionResult> GetUsuarios()
         {

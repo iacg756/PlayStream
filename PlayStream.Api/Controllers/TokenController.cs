@@ -8,9 +8,6 @@ using System.Text;
 
 namespace PlayStream.Api.Controllers
 {
-    /// <summary>
-    /// Autenticación: obtención de token JWT
-    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class TokenController : ControllerBase
@@ -29,13 +26,6 @@ namespace PlayStream.Api.Controllers
             _passwordService = passwordService;
         }
 
-        /// <summary>
-        /// Genera un token JWT para el usuario autenticado.
-        /// </summary>
-        /// <param name="userLogin">Credenciales de acceso.</param>
-        /// <returns>Token JWT.</returns>
-        /// <response code="200">Token generado correctamente.</response>
-        /// <response code="401">Credenciales inválidas.</response>
         [HttpPost]
         [ProducesResponseType(200)]
         [ProducesResponseType(401)]

@@ -21,7 +21,6 @@
             HasPreviousPage = lista.HasPreviousPage;
         }
 
-        // Generic helper to create Pagination from any PagedList<T>
         public static Pagination FromPagedList<T>(PagedList<T> lista)
         {
             return new Pagination
