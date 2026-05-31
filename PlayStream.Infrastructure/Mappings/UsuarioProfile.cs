@@ -1,8 +1,9 @@
-﻿using System;
-using System.Globalization;
-using AutoMapper;
+﻿using AutoMapper;
 using PlayStream.Core.DTOs;
 using PlayStream.Core.Entities;
+using PlayStream.Core.Enum;
+using System;
+using System.Globalization;
 
 namespace PlayStream.Infrastructure.Mappings
 {
@@ -18,7 +19,12 @@ namespace PlayStream.Infrastructure.Mappings
                 .ForMember(dest => dest.FechaRegistro,
                     opt => opt.ConvertUsing(new StringToDateTimeConverter(), src => src.FechaRegistro));
 
-            CreateMap<Security, SecurityDto>().ReverseMap();
+            CreateMap<SecurityDto, Security>()
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src =>
+                    Enum.Parse<RoleType>(src.Role ?? "Consumer")));
+
+            CreateMap<Security, SecurityDto>()
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()));
         }
     }
 

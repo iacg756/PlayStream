@@ -56,5 +56,19 @@ namespace PlayStream.Api.Controllers
                 role
             });
         }
+
+
+
+
+        [HttpPost("setup")]
+        public async Task<IActionResult> Setup([FromBody] SecurityDto securityDto)
+        {
+            var security = _mapper.Map<Security>(securityDto);
+            security.Role = RoleType.Administrador;
+            security.Password = _passwordService.Hash(security.Password);
+            await _securityService.RegisterUser(security);
+            securityDto = _mapper.Map<SecurityDto>(security);
+            return Ok(new ApiResponse<SecurityDto>(securityDto));
+        }
     }
 }
