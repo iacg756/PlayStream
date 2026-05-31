@@ -9,6 +9,9 @@ using PlayStream.Services.Interfaces;
 
 namespace PlayStream.Api.Controllers
 {
+    /// <summary>
+    /// Administración de usuarios del sistema (registro y consulta de sesión)
+    /// </summary>
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
@@ -28,6 +31,13 @@ namespace PlayStream.Api.Controllers
             _passwordService = passwordService;
         }
 
+        /// <summary>
+        /// Registra un nuevo usuario del sistema. Solo accesible por Administradores.
+        /// </summary>
+        /// <param name="securityDto">Datos del usuario: login, password, nombre y rol (Administrador/Consumer).</param>
+        /// <returns>Usuario registrado.</returns>
+        /// <response code="200">Usuario registrado correctamente.</response>
+        /// <response code="403">No tiene permisos de Administrador.</response>
         [Authorize(Roles = nameof(RoleType.Administrador))]
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] SecurityDto securityDto)
@@ -35,11 +45,16 @@ namespace PlayStream.Api.Controllers
             var security = _mapper.Map<Security>(securityDto);
             security.Password = _passwordService.Hash(security.Password);
             await _securityService.RegisterUser(security);
-
             securityDto = _mapper.Map<SecurityDto>(security);
             return Ok(new ApiResponse<SecurityDto>(securityDto));
         }
 
+        /// <summary>
+        /// Retorna los datos del usuario autenticado extraídos del token JWT.
+        /// </summary>
+        /// <returns>Login, nombre y rol del usuario actual.</returns>
+        /// <response code="200">Retorna los datos del usuario autenticado.</response>
+        /// <response code="401">Token inválido o expirado.</response>
         [Authorize]
         [HttpGet("me")]
         public IActionResult Me()
@@ -48,18 +63,15 @@ namespace PlayStream.Api.Controllers
             var name = User.Claims.FirstOrDefault(c => c.Type == "Name")?.Value;
             var role = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
 
-            return Ok(new
-            {
-                message = "Token válido.",
-                login,
-                name,
-                role
-            });
+            return Ok(new { message = "Token válido.", login, name, role });
         }
 
-
-
-
+        /// <summary>
+        /// Endpoint de configuración inicial — crea el primer Administrador del sistema sin requerir autenticación.
+        /// </summary>
+        /// <param name="securityDto">Datos del administrador inicial.</param>
+        /// <returns>Administrador creado.</returns>
+        /// <response code="200">Administrador creado correctamente.</response>
         [HttpPost("setup")]
         public async Task<IActionResult> Setup([FromBody] SecurityDto securityDto)
         {

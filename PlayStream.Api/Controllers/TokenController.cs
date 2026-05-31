@@ -8,6 +8,9 @@ using System.Text;
 
 namespace PlayStream.Api.Controllers
 {
+    /// <summary>
+    /// Autenticación — obtención de token JWT
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class TokenController : ControllerBase
@@ -26,6 +29,16 @@ namespace PlayStream.Api.Controllers
             _passwordService = passwordService;
         }
 
+        /// <summary>
+        /// Autentica un usuario y retorna un token JWT válido por 8 horas.
+        /// </summary>
+        /// <remarks>
+        /// Usa el token retornado en el botón Authorize de Swagger o en el header Authorization: Bearer {token}
+        /// </remarks>
+        /// <param name="userLogin">Credenciales de acceso (user y password).</param>
+        /// <returns>Token JWT.</returns>
+        /// <response code="200">Autenticación exitosa, retorna el token.</response>
+        /// <response code="401">Usuario o contraseña incorrectos.</response>
         [HttpPost]
         [ProducesResponseType(200)]
         [ProducesResponseType(401)]

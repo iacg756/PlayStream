@@ -5,6 +5,9 @@ using PlayStream.Services.Interfaces;
 
 namespace PlayStream.Api.Controllers
 {
+    /// <summary>
+    /// Panel administrativo — estadísticas y gestión general del sistema
+    /// </summary>
     [Authorize(Roles = nameof(RoleType.Administrador))]
     [Produces("application/json")]
     [Route("api/[controller]")]
@@ -25,12 +28,16 @@ namespace PlayStream.Api.Controllers
             _perfilService = perfilService;
         }
 
+        /// <summary>
+        /// Retorna un resumen general del sistema: total de usuarios y timestamp actual.
+        /// </summary>
+        /// <returns>Resumen del panel administrativo.</returns>
+        /// <response code="200">Retorna las estadísticas del sistema.</response>
+        /// <response code="403">No tiene permisos de Administrador.</response>
         [HttpGet("dashboard")]
         public async Task<IActionResult> Dashboard()
         {
             var usuarios = await _usuarioService.GetUsuarios();
-            var contenidos = await _contenidoService.GetContenidoById(0); 
-
             return Ok(new
             {
                 message = "Panel administrativo",
@@ -39,6 +46,12 @@ namespace PlayStream.Api.Controllers
             });
         }
 
+        /// <summary>
+        /// Lista todos los usuarios registrados en la plataforma. Solo Administradores.
+        /// </summary>
+        /// <returns>Lista completa de usuarios.</returns>
+        /// <response code="200">Retorna todos los usuarios.</response>
+        /// <response code="403">No tiene permisos de Administrador.</response>
         [HttpGet("usuarios")]
         public async Task<IActionResult> GetUsuarios()
         {

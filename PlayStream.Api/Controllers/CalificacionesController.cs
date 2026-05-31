@@ -8,6 +8,9 @@ using PlayStream.Services.Interfaces;
 
 namespace PlayStream.Api.Controllers
 {
+    /// <summary>
+    /// Registro y consulta de calificaciones de contenido por perfil
+    /// </summary>
     [Authorize]
     [Produces("application/json")]
     [Route("api/[controller]")]
@@ -23,6 +26,13 @@ namespace PlayStream.Api.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Lista calificaciones con filtros opcionales por perfil, contenido, puntuación o comentario.
+        /// </summary>
+        /// <param name="filters">Filtros opcionales de búsqueda.</param>
+        /// <returns>Lista de calificaciones.</returns>
+        /// <response code="200">Retorna las calificaciones encontradas.</response>
+        /// <response code="401">No autenticado.</response>
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] CalificacionQueryFilter? filters)
         {
@@ -31,6 +41,14 @@ namespace PlayStream.Api.Controllers
             return Ok(new ApiResponse<IEnumerable<CalificacionDto>>(calificacionesDto));
         }
 
+        /// <summary>
+        /// Lista todas las calificaciones de un contenido específico.
+        /// </summary>
+        /// <param name="contenidoId">ID del contenido a consultar.</param>
+        /// <param name="filters">Filtros adicionales opcionales.</param>
+        /// <returns>Lista de calificaciones del contenido.</returns>
+        /// <response code="200">Retorna las calificaciones del contenido.</response>
+        /// <response code="401">No autenticado.</response>
         [HttpGet("contenido/{contenidoId}")]
         public async Task<IActionResult> GetByContenido(int contenidoId, [FromQuery] CalificacionQueryFilter? filters)
         {
@@ -42,6 +60,14 @@ namespace PlayStream.Api.Controllers
             return Ok(new ApiResponse<IEnumerable<CalificacionDto>>(calificacionesDto));
         }
 
+        /// <summary>
+        /// Registra una calificación (1-5 estrellas) para un contenido. No se permiten duplicados por perfil.
+        /// </summary>
+        /// <param name="calificacionDto">Datos de la calificación: perfilId, contenidoId, puntuación y comentario opcional.</param>
+        /// <returns>Calificación registrada.</returns>
+        /// <response code="201">Calificación registrada correctamente.</response>
+        /// <response code="400">Datos inválidos.</response>
+        /// <response code="409">El perfil ya calificó este contenido.</response>
         [HttpPost]
         public async Task<IActionResult> Post(CalificacionDto calificacionDto)
         {

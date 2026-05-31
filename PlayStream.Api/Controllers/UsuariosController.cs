@@ -6,12 +6,12 @@ using PlayStream.Core.DTOs;
 using PlayStream.Core.Entities;
 using PlayStream.Core.QueryFilters;
 using PlayStream.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace PlayStream.Api.Controllers
 {
+    /// <summary>
+    /// Gestión de cuentas de usuario de la plataforma
+    /// </summary>
     [Authorize]
     [Produces("application/json")]
     [Route("api/[controller]")]
@@ -27,6 +27,13 @@ namespace PlayStream.Api.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Lista todos los usuarios registrados en la plataforma.
+        /// </summary>
+        /// <param name="filters">Filtros opcionales: nombre o correo.</param>
+        /// <returns>Lista de usuarios.</returns>
+        /// <response code="200">Retorna la lista de usuarios.</response>
+        /// <response code="401">No autenticado.</response>
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] UsuarioQueryFilter? filters)
         {
@@ -35,6 +42,13 @@ namespace PlayStream.Api.Controllers
             return Ok(new ApiResponse<IEnumerable<UsuarioDto>>(usuariosDto));
         }
 
+        /// <summary>
+        /// Obtiene un usuario específico por su ID.
+        /// </summary>
+        /// <param name="id">ID del usuario.</param>
+        /// <returns>Datos del usuario.</returns>
+        /// <response code="200">Retorna el usuario encontrado.</response>
+        /// <response code="404">Usuario no encontrado.</response>
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -45,6 +59,13 @@ namespace PlayStream.Api.Controllers
             return Ok(new ApiResponse<UsuarioDto>(usuarioDto));
         }
 
+        /// <summary>
+        /// Registra un nuevo usuario en la plataforma.
+        /// </summary>
+        /// <param name="usuarioDto">Datos del nuevo usuario (nombre y correo).</param>
+        /// <returns>Usuario creado.</returns>
+        /// <response code="201">Usuario creado correctamente.</response>
+        /// <response code="400">Datos inválidos.</response>
         [HttpPost]
         public async Task<IActionResult> Post(UsuarioDto usuarioDto)
         {
