@@ -20,6 +20,10 @@ namespace PlayStream.Infrastructure.Data.Configurations
             builder.Property(e => e.PerfilId).HasColumnType("int(11)");
             builder.Property(e => e.Puntuacion).HasColumnType("int(11)");
 
+            builder.Property(e => e.FechaCalificacion)
+                .HasColumnType("datetime")
+                .IsRequired(false);
+
             builder.HasOne(d => d.Contenido).WithMany(p => p.Calificacions)
                 .HasForeignKey(d => d.ContenidoId)
                 .HasConstraintName("FK_Calificacion_Contenido");

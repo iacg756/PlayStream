@@ -12,7 +12,9 @@ namespace PlayStream.Api.Controllers
     /// <summary>
     /// Administración de usuarios del sistema (registro y consulta de sesión)
     /// </summary>
+    [Authorize]
     [Produces("application/json")]
+    [Consumes("application/json")]
     [Route("api/[controller]")]
     [ApiController]
     public class SecurityController : ControllerBase

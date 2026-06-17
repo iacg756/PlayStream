@@ -30,9 +30,36 @@ namespace PlayStream.Services.Services
             if (perfil == null)
                 throw new BussinesException("El perfil no existe", HttpStatusCode.NotFound);
 
-            var existentes = await _unitOfWork.CalificacionRepository.GetAllAsync();
+            var existentes = (await _unitOfWork.CalificacionRepository.GetAllAsync()).ToList();
+
+
+
+
+           
             if (existentes.Any(c => c.PerfilId == calificacion.PerfilId && c.ContenidoId == calificacion.ContenidoId))
                 throw new BussinesException("Ya has calificado este contenido anteriormente", HttpStatusCode.Conflict);
+
+            
+            var ultimaCalificacion = existentes
+                .Where(c => c.PerfilId == calificacion.PerfilId && c.FechaCalificacion.HasValue)
+                .OrderByDescending(c => c.FechaCalificacion)
+                .FirstOrDefault();
+
+            if (ultimaCalificacion != null && ultimaCalificacion.FechaCalificacion.HasValue)
+            {
+                var segundosTranscurridos = (DateTime.UtcNow - ultimaCalificacion.FechaCalificacion.Value).TotalSeconds;
+                if (segundosTranscurridos < 60)
+                {
+                    var segundosRestantes = (int)(60 - segundosTranscurridos);
+                    throw new BussinesException($"Debes esperar {segundosRestantes} segundo(s) antes de volver a calificar.", HttpStatusCode.TooManyRequests);
+                }
+            }
+
+            
+            calificacion.FechaCalificacion = DateTime.UtcNow;
+
+
+
 
             await _unitOfWork.CalificacionRepository.AddAsync(calificacion);
             await _unitOfWork.SaveChangesAsync();

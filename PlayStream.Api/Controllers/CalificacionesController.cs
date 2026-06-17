@@ -13,6 +13,7 @@ namespace PlayStream.Api.Controllers
     /// </summary>
     [Authorize]
     [Produces("application/json")]
+    [Consumes("application/json")]
     [Route("api/[controller]")]
     [ApiController]
     public class CalificacionesController : ControllerBase
@@ -61,13 +62,19 @@ namespace PlayStream.Api.Controllers
         }
 
         /// <summary>
-        /// Registra una calificación (1-5 estrellas) para un contenido. No se permiten duplicados por perfil.
+        /// Registra una calificación (1-5 estrellas) para un contenido.
         /// </summary>
-        /// <param name="calificacionDto">Datos de la calificación: perfilId, contenidoId, puntuación y comentario opcional.</param>
-        /// <returns>Calificación registrada.</returns>
+        /// <remarks>
+        /// Reglas de negocio aplicadas:
+        /// - Un perfil no puede calificar el mismo contenido más de una vez.
+        /// - RN-07: Un perfil debe esperar 1 minuto entre calificaciones para evitar spam (Review Bombing).
+        /// </remarks>
+        /// <param name="calificacionDto">Datos: perfilId, contenidoId, puntuación (1-5) y comentario opcional.</param>
+        /// <returns>Calificación registrada con su fecha.</returns>
         /// <response code="201">Calificación registrada correctamente.</response>
         /// <response code="400">Datos inválidos.</response>
         /// <response code="409">El perfil ya calificó este contenido.</response>
+        /// <response code="429">Debe esperar 1 minuto antes de volver a calificar (cooldown anti-spam).</response>
         [HttpPost]
         public async Task<IActionResult> Post(CalificacionDto calificacionDto)
         {
@@ -76,7 +83,9 @@ namespace PlayStream.Api.Controllers
                 var calificacion = _mapper.Map<PlayStream.Core.Entities.Calificacion>(calificacionDto);
                 await _calificacionService.InsertCalificacion(calificacion);
                 var resultDto = _mapper.Map<CalificacionDto>(calificacion);
-                return CreatedAtAction(nameof(GetByContenido), new { contenidoId = calificacion.ContenidoId }, new ApiResponse<CalificacionDto>(resultDto));
+                return CreatedAtAction(nameof(GetByContenido),
+                    new { contenidoId = calificacion.ContenidoId },
+                    new ApiResponse<CalificacionDto>(resultDto));
             }
             catch (Exception ex)
             {

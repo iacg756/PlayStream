@@ -14,6 +14,7 @@ namespace PlayStream.Api.Controllers
     /// </summary>
     [Authorize]
     [Produces("application/json")]
+    [Consumes("application/json")]
     [Route("api/[controller]")]
     [ApiController]
     public class UsuariosController : ControllerBase

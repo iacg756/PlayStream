@@ -7,5 +7,9 @@
         public int ContenidoId { get; set; }
         public int Puntuacion { get; set; }
         public string? Comentario { get; set; }
+        
+
+
+        public DateTime? FechaCalificacion { get; set; }
     }
 }
